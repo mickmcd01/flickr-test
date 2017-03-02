@@ -21,6 +21,9 @@ def process_album(flickr, album):
                 total_views += int(photo['views'])
             print 'Total number of photos in the album %d' % len(photos)
             print 'Total number of views for pictures in the album %d' % total_views
+            break
+    else:
+        print 'Album "%s" was not found.' % album
 
 
 def main():
