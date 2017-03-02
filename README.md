@@ -1,5 +1,7 @@
 # flickr-test
 
+Requires flickrapi (https://stuvel.eu/flickrapi-doc/index.html): easy_install flickrapi
+
 usage: flickr_test.py [-h] [--keyfile KEYFILE] [--album ALBUM]
 
 optional arguments:
