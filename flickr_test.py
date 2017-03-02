@@ -1,39 +1,50 @@
+import sys
+import argparse
 import flickrapi
 
-with open('./flickr_keys.txt') as f:
-    key_info = f.readlines()
 
-api_key = key_info[0].strip()
-api_secret = key_info[1].strip()
+def sort_func(photo):
+    return int(photo['views'])
 
-flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
-flickr.authenticate_via_browser(perms='read')
 
-sets = flickr.photosets.getList()
-print sets
-title = sets['photosets']['photoset'][0]['title']['_content']
-print title
-title = sets['photosets']['photoset'][1]['title']['_content']
-print title
-photosets = sets['photosets']
-print len(photosets)
-photosets = sets['photosets']['photoset']
-print len(photosets)
+def process_album(flickr, album):
+    sets = flickr.photosets.getList()
+    photosets = sets['photosets']['photoset']
+    for set in photosets:
+        if set['title']['_content'].lower() == album.lower():
+            photoset = flickr.photosets.getPhotos(photoset_id=set['id'], extras='views', per_page=200)
+            photos = photoset['photoset']['photo']
+            photos = sorted(photos, key=sort_func)
+            for photo in photos:
+                print 'Views: %d, Title/ID: %s %s' % (int(photo['views']), photo['title'], photo['id'])
+            print 'Total number of photos in the album %d' % len(photos)
 
-for entry in photosets:
-    print entry['title']
-for entry in photosets:
-    print entry['title'], entry['photos'], entry['id']
 
-id = sets['photosets']['photoset'][1]['id']
-print id
-x = flickr.photosets.getInfo(photoset_id=id)
-print x
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--keyfile', help='Path to keyfile (defaults to ./flickr_keys.txt)')
+    parser.add_argument('--album', help='The album to process')
+    args = parser.parse_args()
 
-photos = flickr.photosets.getPhotos(photoset_id=id, extras='views', per_page=3)
-print photos
-for photo in photos['photoset']['photo']:
-    print photo['title'], photo['views'], photo['id']
+    if not args.album:
+        print 'The album name must be specified'
+        sys.exit()
 
-details = flickr.photos.getInfo(photo_id=photos['photoset']['photo'][2]['id'])
-print details
+    if args.keyfile:
+        keyfile = args.keyfile
+    else:
+        keyfile = './flickr_keys.txt'
+
+    with open(keyfile) as f:
+        key_info = f.readlines()
+
+    api_key = key_info[0].strip()
+    api_secret = key_info[1].strip()
+
+    flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
+    flickr.authenticate_via_browser(perms='read')
+
+    process_album(flickr, args.album)
+
+if __name__ == "__main__":
+    main()
