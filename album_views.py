@@ -1,6 +1,7 @@
 import sys
 import argparse
 import flickrapi
+import settings
 
 
 def sort_func(photo):
@@ -28,7 +29,6 @@ def process_album(flickr, album):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--keyfile', help='Path to keyfile (defaults to ./flickr_keys.txt)')
     parser.add_argument('--album', help='The album to process')
     args = parser.parse_args()
 
@@ -36,18 +36,7 @@ def main():
         print 'The album name must be specified'
         sys.exit()
 
-    if args.keyfile:
-        keyfile = args.keyfile
-    else:
-        keyfile = './flickr_keys.txt'
-
-    with open(keyfile) as f:
-        key_info = f.readlines()
-
-    api_key = key_info[0].strip()
-    api_secret = key_info[1].strip()
-
-    flickr = flickrapi.FlickrAPI(api_key, api_secret, format='parsed-json')
+    flickr = flickrapi.FlickrAPI(settings.flickr_api_key, settings.flickr_secret, format='parsed-json')
     flickr.authenticate_via_browser(perms='read')
 
     process_album(flickr, args.album)

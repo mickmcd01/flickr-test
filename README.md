@@ -2,12 +2,11 @@
 
 Requires flickrapi (https://stuvel.eu/flickrapi-doc/index.html): easy_install flickrapi
 
-usage: flickr_test.py [-h] [--keyfile KEYFILE] [--album ALBUM]
+usage: flickr_test.py [-h] [--album ALBUM]
 
 optional arguments:
   -h, --help         show this help message and exit
-  --keyfile KEYFILE  Path to keyfile (defaults to ./flickr_keys.txt)
   --album ALBUM      The album to process
 
-keyfile is a file containing 2 lines: the first line is the API key, the second line is the secret. 
-if keyfile argument is not present, the file flickr_keys.txt in the current directory is used.
+settings.py contains program configuration settings. Create the settings.py file by copying 
+settings_example.py and filling in the appropriate values.
