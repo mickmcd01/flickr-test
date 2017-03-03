@@ -3,7 +3,6 @@ import argparse
 import flickrapi
 import settings
 
-
 def sort_func(photo):
     return int(photo['views'])
 
@@ -16,9 +15,17 @@ def process_album(flickr, album):
             photoset = flickr.photosets.getPhotos(photoset_id=set['id'], extras='views', per_page=200)
             photos = photoset['photoset']['photo']
             photos = sorted(photos, key=sort_func)
+
             total_views = 0
             for photo in photos:
-                print 'Views: %d, Title/ID: %s %s' % (int(photo['views']), photo['title'], photo['id'])
+                info = flickr.photos.getInfo(photo_id=photo['id'])
+                desc = info['photo']['description']['_content']
+                if desc:
+                    title = '%s, %s' % (photo['title'], desc)
+                else:
+                    title = photo['title']
+                print 'Views: %d, Title/Desc.: %s' % (int(photo['views']), title)
+                print '\t\tLink: %s' % info['photo']['urls']['url'][0]['_content']
                 total_views += int(photo['views'])
             print 'Total number of photos in the album %d' % len(photos)
             print 'Total number of views for pictures in the album %d' % total_views
